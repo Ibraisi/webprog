@@ -1,8 +1,28 @@
 'use strict';
-/**
- * Reflection question 1
- * your answer goes here
- */
+/*
+Reflection question 1:
+In most programming languages, a complete record for each ingredient would be used, for example:
+
+Salad: {
+  price: 10,
+  foundation: true,
+  protein: false,
+  extra: false,
+  dressing: false,
+  vegan: true,
+  gluten: false,
+  lactose: false
+}
+
+This is not the case in the inventory, which is common when writing JavaScript code.
+Why don't we need to store properties with the value false in the JavaScript objects?
+
+Your answer:
+Undefined properties are treated as false in boolean contexts.
+This saves memory and improves readability.
+It aligns with JavaScript's dynamic nature.
+
+*/
 
 import inventory from './inventory.mjs';
 console.log('\n=== beginning of printout ================================')
@@ -19,8 +39,23 @@ for (const name in inventory) {
   console.log(name);
 }
 /**
- * Reflection question 2
- */
+Reflection question 2: When will the two examples above give different outputs, and why
+is inherited functions, such as forEach(), not printed? Hint: read about enumerable
+properties and own properties.
+Answer:
+The two examples will give different outputs when the object has inherited enumerable
+properties. The for...in loop iterates over all enumerable properties, including
+inherited ones, while Object.keys() only returns an object's own enumerable properties.
+Inherited functions like forEach() aren't printed because:
+
+They're typically non-enumerable properties.
+Object.keys() only returns own properties, not inherited ones.
+
+This difference is due to how JavaScript handles property enumeration and inheritance.
+Object.keys() provides a more predictable way to iterate over an object's direct
+properties, which is often preferred in modern JavaScript for clarity and avoiding
+unexpected inherited properties.
+*/
 
 console.log('\n--- Assignment 1 ---------------------------------------')
 
