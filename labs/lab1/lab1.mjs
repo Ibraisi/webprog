@@ -94,11 +94,14 @@ or the backwards compatible constructor function for this and the remaining assi
 
 class Salad {
     constructor(salad) {
-        if(salad instanceof Salad) {
-            this.ingredients = {...salad.ingredients};
+        if (salad instanceof Salad) {
+            this.ingredients = { ...salad.ingredients };
+        } else if (typeof salad === 'object' && salad !== null) {
+            this.ingredients = { ...salad.ingredients };
         } else {
-        this.ingredients = {};
-    }
+            this.ingredients = {};
+        }
+        this.id = 'salad_' + Salad.instanceCounter++;
 }
 
     add(name, ingredient) {
@@ -116,10 +119,11 @@ Salad object, or an array of Salad objects. The argument must be the JSON repres
 of a singel salad, or an array of salads
      */
     static parse(json) {
-        if (Array.isArray(json)) {
-            return json.map(salad => new Salad(salad));
+        const parsed = JSON.parse(json);
+        if (Array.isArray(parsed)) {
+            return parsed.map(salad => new Salad(salad));
         } else {
-            return new Salad(JSON.parse(json));
+            return new Salad(parsed);
         }
     }
 }
@@ -203,6 +207,7 @@ console.log('check 3: ' + (Object.prototype === Object.getPrototypeOf(Salad.prot
 
 console.log('\n--- Assignment 4 ---------------------------------------')
 
+
 const singleText = JSON.stringify(myCaesarSalad);
 const arrayText = JSON.stringify([myCaesarSalad, myCaesarSalad]);
 
@@ -220,7 +225,42 @@ console.log('originalet kostar ' + myCaesarSalad.getPrice() + ' kr');
 console.log('kopian med gurka kostar ' + singleCopy.getPrice() + ' kr');
 
 console.log('\n--- Assignment 5 ---------------------------------------')
-/*
+
+class GourmetSalad extends Salad {
+    constructor(salad) {
+        super(salad);
+    }
+
+    add(name, ingredient, amount = 1) {
+        // Make a copy of the ingredient to avoid modifying shared objects
+        const ingredientCopy = { ...ingredient, size: ingredient.size || 1 };
+
+        if (this.ingredients[name]) {
+            this.ingredients[name].size += amount;
+        } else {
+            this.ingredients[name] = { ...ingredientCopy, size: amount };
+        }
+
+        // Call the superclass add method
+        super.add(name, this.ingredients[name]);
+
+        return this;
+    }
+
+    remove(name, amount) {
+        if (this.ingredients[name]) {
+            this.ingredients[name].size -= amount;
+            if (this.ingredients[name].size <= 0) {
+                delete this.ingredients[name];
+            }
+        }
+        return this;
+    }
+
+    getPrice() {
+        return Object.values(this.ingredients).reduce((acc, curr) => acc + curr.price * curr.size, 0);
+    }
+}
 let myGourmetSalad = new GourmetSalad()
   .add('Sallad', inventory['Sallad'], 0.5)
   .add('Kycklingfilé', inventory['Kycklingfilé'], 2)
@@ -231,7 +271,7 @@ let myGourmetSalad = new GourmetSalad()
 console.log('Min gourmetsallad med lite bacon kostar ' + myGourmetSalad.getPrice() + ' kr');
 myGourmetSalad.add('Bacon', inventory['Bacon'], 1)
 console.log('Med extra bacon kostar den ' + myGourmetSalad.getPrice() + ' kr');
-*/
+
 console.log('\n--- Assignment 6 ---------------------------------------')
 /*
 console.log('Min gourmetsallad har id: ' + myGourmetSalad.id);
