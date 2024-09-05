@@ -25,6 +25,7 @@ It aligns with JavaScript's dynamic nature.
 */
 
 import inventory from './inventory.mjs';
+import { v4 as uuidv4 } from 'uuid';
 console.log('\n=== beginning of printout ================================')
 console.log('inventory:', inventory);
 
@@ -93,15 +94,24 @@ or the backwards compatible constructor function for this and the remaining assi
  */
 
 class Salad {
+    static instanceCounter = 0;
+
     constructor(salad) {
         if (salad instanceof Salad) {
+            // Copy the ingredients from the salad
             this.ingredients = { ...salad.ingredients };
-        } else if (typeof salad === 'object' && salad !== null) {
+            // Generate a new unique UUID
+            this.uuid = uuidv4();
+        }else if (typeof salad === 'object' && salad !== null) {
             this.ingredients = { ...salad.ingredients };
+            this.uuid = salad.uuid || uuidv4();
+
         } else {
             this.ingredients = {};
+            this.uuid = uuidv4();
         }
         this.id = 'salad_' + Salad.instanceCounter++;
+
 }
 
     add(name, ingredient) {
@@ -117,6 +127,7 @@ class Salad {
 Assignment 4b: Add a static function, Salad.parse(json) that parse a string and return a
 Salad object, or an array of Salad objects. The argument must be the JSON representation
 of a singel salad, or an array of salads
+
      */
     static parse(json) {
         const parsed = JSON.parse(json);
@@ -216,7 +227,7 @@ const singleCopy = Salad.parse(singleText);
 const arrayCopy = Salad.parse(arrayText);
 
 console.log('original myCaesarSalad\n' + JSON.stringify(myCaesarSalad));
-console.log('new(myCaesarSalad)\n' + JSON.stringify(objectCopy));
+console.log('new(myCaesarSalad) this should have diffrent UUID\n' + JSON.stringify(objectCopy));
 console.log('Salad.parse(singleText)\n' + JSON.stringify(singleCopy));
 console.log('Salad.parse(arrayText)\n' + JSON.stringify(arrayCopy));
 
@@ -273,17 +284,52 @@ myGourmetSalad.add('Bacon', inventory['Bacon'], 1)
 console.log('Med extra bacon kostar den ' + myGourmetSalad.getPrice() + ' kr');
 
 console.log('\n--- Assignment 6 ---------------------------------------')
-/*
+
 console.log('Min gourmetsallad har id: ' + myGourmetSalad.id);
 console.log('Min gourmetsallad har uuid: ' + myGourmetSalad.uuid);
-*/
 
 /**
- * Reflection question 4
- */
+Reflection question 4: In which object are static properties stored?
+Static properties are stored in the constructor function itself.
+
+Reflection question 5: Can you make the id property read only?
+Yes, by using a getter without a setter.
+
+Reflection question 6: Can properties be private?
+Yes, using the # syntax.
+
+Reflection question 7: What is the difference between the id and uuid properties?
+id is a simple incrementing number, while uuid is a unique identifier.Id will reset when the session ends,
+ while uuid will not.
+*/
+console.log('\n--- Assignment 7 ---------------------------------------')
+
 /**
- * Reflection question 5
+ *Create an object to manage an order. Example of functions needed: create an empty
+shopping basket, add and remove a salad, calculate the total price for all salads in the
+shopping basket
  */
-/**
- * Reflection question 6
- */
+class Order {
+    constructor(){
+        this.salads = [];
+        this.uuid = uuidv4();
+    }
+
+    add(salad){
+        this.salads.push(salad);
+    }
+    remove(salad){
+        this.salads = this.salads.filter(s => s.uuid !== salad.uuid);
+    }
+    calculateTotalPrice(){
+        return this.salads.reduce((acc, curr) => acc + curr.getPrice(), 0);
+        }
+}
+// add some test to the order object
+const order = new Order();
+order.add(myCaesarSalad);
+order.add(myGourmetSalad);
+console.log('Total price for the order is: ' + order.calculateTotalPrice() + ' kr');
+order.remove(myGourmetSalad);
+console.log('Total price for the order is: ' + order.calculateTotalPrice() + ' kr');
+console.log('Order uuid: ' + order.uuid);

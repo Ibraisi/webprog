@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "jslint": "^0.12.1"
+    "jslint": "^0.12.1",
+    "uuid": "^10.0.0"
   }
 }
