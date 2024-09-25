@@ -1,6 +1,6 @@
 import React from 'react'
 
-function SaladCheckBox({ extra, checked, onChange }) {
+function SaladCheckBox({ extra, checked, onChange, price }) {
   return (
     <div className="col mb-3">
       <div className="form-check">
@@ -12,7 +12,7 @@ function SaladCheckBox({ extra, checked, onChange }) {
           onChange={onChange}
           className="form-check-input"
         />
-        <label htmlFor={extra} className="form-check-label">{extra}</label>
+        <label htmlFor={extra} className="form-check-label">{extra}({price} kr)</label>
       </div>
     </div>
   )

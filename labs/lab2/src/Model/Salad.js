@@ -80,6 +80,7 @@ class Salad {
         return price;
     }
 
+
     count(prop) {
         let count = 0;
         if (this.foundation && inventory[this.foundation][prop]) count++;

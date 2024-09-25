@@ -1,6 +1,6 @@
 import React from 'react';
 
-function ViewOrder({ shoppingCart }) {
+function ViewOrder({ shoppingCart, removeFromOrder, editShoppingCart }) {
     return (
         <div className="mb-3">
             <div className="card">
@@ -12,14 +12,28 @@ function ViewOrder({ shoppingCart }) {
                         <li key={salad.uuid} className="list-group-item">
                             <div className="d-flex justify-content-between align-items-center">
                                 <h5 className="mb-1">Salad {index + 1}</h5>
-                                <span className="badge bg-primary rounded-pill">{salad.getPrice()} kr</span>
+                                <div>
+                                    <span className="badge bg-primary rounded-pill me-2">{salad.getPrice()} kr</span>
+                                    <button
+                                        className="btn btn-danger btn-sm"
+                                        onClick={() => removeFromOrder(salad.uuid)}
+                                    >
+                                        Remove
+                                    </button>
+                                    <button
+                                        className="btn btn-primary btn-sm ms-2"
+                                        onClick={() => editShoppingCart(salad.uuid)}
+                                    >
+                                        Edit
+                                    </button>
+                                </div>
                             </div>
                             <p className="mb-1 text-muted">
                                 {[
                                     salad.foundation,
                                     salad.protein,
+                                    salad.dressing,
                                     ...Object.keys(salad.extras),
-                                    salad.dressing
                                 ].filter(Boolean).join(', ')}
                             </p>
                         </li>

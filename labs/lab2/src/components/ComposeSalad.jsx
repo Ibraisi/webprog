@@ -4,8 +4,8 @@ import SelectExtra from './SaladComponants/SelectExtra';
 import Salad from '../Model/Salad';
 
 
-function ComposeSalad({ inventory, addToOrder }) {
-  const [foundation, setFoundation] = useState("Salad");
+function ComposeSalad({ inventory, addToOrder , saladToEdit,updateOrder }) {
+  const [foundation, setFoundation] = useState('Sallad');
   const [protein, setProtein] = useState('Kycklingfilé');
   const [extras, setExtras] = useState({Avocado:true, Bacon:true});
   const [dressing, setDressing] = useState('Pesto');
@@ -18,9 +18,32 @@ function ComposeSalad({ inventory, addToOrder }) {
   useEffect(() => {
     setFoundationOptions(Object.keys(inventory).filter(item => inventory[item].foundation));
     setProteinOptions(Object.keys(inventory).filter(item => inventory[item].protein));
-    setExtrasOptions(Object.keys(inventory).filter(item => inventory[item].extra));
-    setDressingOptions(Object.keys(inventory).filter(item => inventory[item].dressing));
+    setExtrasOptions(Object.keys(inventory)
+    .filter(item => inventory[item].extra)
+    .map(item => ({
+      name: item,
+      price: inventory[item].price
+    }))
+  );    setDressingOptions(Object.keys(inventory).filter(item => inventory[item].dressing));
   }, [inventory]);
+
+  useEffect(() => {
+    if (saladToEdit) {
+      setFoundation(saladToEdit.foundation);
+      setProtein(saladToEdit.protein);
+      setDressing(saladToEdit.dressing);
+
+      // Set extras
+      if (saladToEdit.extras && typeof saladToEdit.extras === 'object') {
+        setExtras(saladToEdit.extras);
+      } else {
+        setExtras({});
+      }
+    }
+  }, [saladToEdit]);
+
+
+
 
   const handleExtraChange = (event) => {
     const { name, checked } = event.target;
@@ -43,14 +66,18 @@ function ComposeSalad({ inventory, addToOrder }) {
     selectedExtras.forEach(extra => newSalad.addExtra(extra));
 
     console.log(newSalad);
-    addToOrder(newSalad);
-
+    if (saladToEdit) {
+        newSalad.uuid = saladToEdit.uuid;
+        updateOrder(newSalad);
+      } else {
+        addToOrder(newSalad);
+      }
     // Reset form
     setFoundation('');
     setProtein('');
     setExtras({});
     setDressing('');
-};
+  };
 
   return (
     <div className="container col-12">
