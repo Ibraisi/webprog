@@ -19,14 +19,13 @@ Why don't we need to store properties with the value false in the JavaScript obj
 
 Your answer:
 Undefined properties are treated as false in boolean contexts.
-This saves memory and improves readability.
-It aligns with JavaScript's dynamic nature.
-
 */
 
 import inventory from './inventory.mjs';
 import { v4 as uuidv4 } from 'uuid';
+
 console.log('\n=== beginning of printout ================================')
+
 console.log('inventory:', inventory);
 
 console.log('\n--- Object.keys() ---------------------------------------')
@@ -95,7 +94,7 @@ or the backwards compatible constructor function for this and the remaining assi
 
 class Salad {
     static instanceCounter = 0;
-
+    #id;
     constructor(salad) {
         if (salad instanceof Salad) {
             // Copy the ingredients from the salad
@@ -110,7 +109,7 @@ class Salad {
             this.ingredients = {};
             this.uuid = uuidv4();
         }
-        this.id = 'salad_' + Salad.instanceCounter++;
+        this.#id = 'salad_' + Salad.instanceCounter++;
 
 }
 
@@ -209,9 +208,10 @@ Answer: # JavaScript Class and Inheritance Representation
  */
 console.log('typeof Salad: ' + typeof Salad);
 console.log('typeof Salad.prototype: ' + typeof Salad.prototype);
-console.log('typeof Salad.prototype.prototype: ' + typeof Salad.prototype.prototype);
+console.log('typeof Salad.prototype.prototype: ' + typeof Salad.prototype.__proto__);
 console.log('typeof myCaesarSalad: ' + typeof myCaesarSalad);
 console.log('typeof myCaesarSalad.prototype: ' + typeof myCaesarSalad.prototype);
+
 console.log('check 1: ' + (Salad.prototype === Object.getPrototypeOf(Salad)));
 console.log('check 2: ' + (Salad.prototype === Object.getPrototypeOf(myCaesarSalad)));
 console.log('check 3: ' + (Object.prototype === Object.getPrototypeOf(Salad.prototype)));
@@ -225,6 +225,7 @@ const arrayText = JSON.stringify([myCaesarSalad, myCaesarSalad]);
 const objectCopy = new Salad(myCaesarSalad);
 const singleCopy = Salad.parse(singleText);
 const arrayCopy = Salad.parse(arrayText);
+
 
 console.log('original myCaesarSalad\n' + JSON.stringify(myCaesarSalad));
 console.log('new(myCaesarSalad) this should have diffrent UUID\n' + JSON.stringify(objectCopy));
@@ -294,6 +295,7 @@ Static properties are stored in the constructor function itself.
 
 Reflection question 5: Can you make the id property read only?
 Yes, by using a getter without a setter.
+
 
 Reflection question 6: Can properties be private?
 Yes, using the # syntax.

@@ -3,12 +3,13 @@ import SelectIngredient from './SaladComponants/SelectIngredient';
 import SelectExtra from './SaladComponants/SelectExtra';
 import Salad from '../Model/Salad';
 
-
-function ComposeSalad({ inventory, addToOrder , saladToEdit,updateOrder }) {
-  const [foundation, setFoundation] = useState('Sallad');
-  const [protein, setProtein] = useState('Kycklingfilé');
-  const [extras, setExtras] = useState({Avocado:true, Bacon:true});
-  const [dressing, setDressing] = useState('Pesto');
+function ComposeSalad({ inventory, addToOrder, saladToEdit, updateOrder }) {
+  const [foundation, setFoundation] = useState('');
+  const [protein, setProtein] = useState('');
+  const [extras, setExtras] = useState({});
+  const [dressing, setDressing] = useState('');
+  const [touched, setTouched] = useState(false);
+  const [showExtrasError, setShowExtrasError] = useState(false);
 
   const [foundationOptions, setFoundationOptions] = useState([]);
   const [proteinOptions, setProteinOptions] = useState([]);
@@ -19,31 +20,14 @@ function ComposeSalad({ inventory, addToOrder , saladToEdit,updateOrder }) {
     setFoundationOptions(Object.keys(inventory).filter(item => inventory[item].foundation));
     setProteinOptions(Object.keys(inventory).filter(item => inventory[item].protein));
     setExtrasOptions(Object.keys(inventory)
-    .filter(item => inventory[item].extra)
-    .map(item => ({
-      name: item,
-      price: inventory[item].price
-    }))
-  );    setDressingOptions(Object.keys(inventory).filter(item => inventory[item].dressing));
+      .filter(item => inventory[item].extra)
+      .map(item => ({
+        name: item,
+        price: inventory[item].price
+      }))
+    );
+    setDressingOptions(Object.keys(inventory).filter(item => inventory[item].dressing));
   }, [inventory]);
-
-  useEffect(() => {
-    if (saladToEdit) {
-      setFoundation(saladToEdit.foundation);
-      setProtein(saladToEdit.protein);
-      setDressing(saladToEdit.dressing);
-
-      // Set extras
-      if (saladToEdit.extras && typeof saladToEdit.extras === 'object') {
-        setExtras(saladToEdit.extras);
-      } else {
-        setExtras({});
-      }
-    }
-  }, [saladToEdit]);
-
-
-
 
   const handleExtraChange = (event) => {
     const { name, checked } = event.target;
@@ -52,38 +36,47 @@ function ComposeSalad({ inventory, addToOrder , saladToEdit,updateOrder }) {
 
   const handleSubmit = (event) => {
     event.preventDefault();
+    setTouched(true);
+
     const selectedExtras = Object.keys(extras).filter(key => extras[key]);
-    if (!foundation || !protein || selectedExtras.length < 2 || !dressing) {
-        alert('Please fill out all fields and select at least two extras.');
-        return;
+    if (!foundation || !protein || selectedExtras.length < 3 || selectedExtras.length > 9 || !dressing) {
+      if (selectedExtras.length < 3 || selectedExtras.length > 9) {
+        setShowExtrasError(true);
+      } else {
+        setShowExtrasError(false);
+      }
+      return;
     }
+
+    setShowExtrasError(false);
 
     const newSalad = new Salad();
     newSalad.setFoundation(foundation)
-             .setProtein(protein)
-             .setDressing(dressing);
+      .setProtein(protein)
+      .setDressing(dressing);
 
     selectedExtras.forEach(extra => newSalad.addExtra(extra));
 
-    console.log(newSalad);
     if (saladToEdit) {
-        newSalad.uuid = saladToEdit.uuid;
-        updateOrder(newSalad);
-      } else {
-        addToOrder(newSalad);
-      }
+      newSalad.uuid = saladToEdit.uuid;
+      updateOrder(newSalad);
+    } else {
+      addToOrder(newSalad);
+    }
+
     // Reset form
     setFoundation('');
     setProtein('');
     setExtras({});
     setDressing('');
+    setTouched(false);
   };
 
   return (
     <div className="container col-12">
       <div className="row h-200 p-5 bg-light border rounded-3">
         <h2>Välj innehållet i din sallad</h2>
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className={touched ? "was-validated" : ""} noValidate>
           <SelectIngredient
             label="Välj bas"
             value={foundation}
@@ -97,10 +90,16 @@ function ComposeSalad({ inventory, addToOrder , saladToEdit,updateOrder }) {
             options={proteinOptions}
           />
           <SelectExtra
-              extrasOptions={extrasOptions}
-              extras={extras}
-              handleExtraChange={handleExtraChange}
+            extrasOptions={extrasOptions}
+            extras={extras}
+            handleExtraChange={handleExtraChange}
           />
+          {/* Alert message for extras validation */}
+          {showExtrasError && (
+            <div className="alert alert-danger mt-2">
+              Please select at least three but no more than nine extras.
+            </div>
+          )}
           <SelectIngredient
             label="Välj dressing"
             value={dressing}
